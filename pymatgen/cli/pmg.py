@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import sys
+import os
 
 from tabulate import tabulate, tabulate_formats
 
@@ -17,6 +19,8 @@ from pymatgen.cli.pmg_structure import analyze_structures
 from pymatgen.core import SETTINGS
 from pymatgen.core.structure import Structure
 from pymatgen.io.vasp import Incar, Potcar
+from pymatgen.cli.pmg_hacks import bs
+from pymatgen import __version__
 
 
 def parse_view(args):
@@ -431,6 +435,31 @@ def main():
         help="Dirname to find and generate from POTCAR.spec.",
     )
     parser_potcar.set_defaults(func=generate_potcar)
+
+    # hacks parser
+    parser_bs = subparsers.add_parser(
+        "bs", help="Fast band structure utilities")
+    group = parser_bs.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "-p", "--plot", dest="plot", action="store_true", help="plot"
+        " bandstructure")
+    group.add_argument(
+        "-k", "--kpoints", dest="kpoints", action="store_true",
+        help="prepare kpoints")
+    parser_bs.add_argument(
+        "-d", "--dir", dest="dir", help="directory to read from",
+        default=os.getcwd())
+    parser_bs.add_argument(
+        "-l", "--linedensity", dest="line_density", help="density of "
+        "kpoints along high symmetry path", type=int, default=20)
+    parser_bs.add_argument(
+        "-s", "--symmetrypath", dest="path", help="high symmetry path"
+        "to take, comma separated list")
+    parser_bs.add_argument(
+        "-a", "--append", dest="append_filename", action="store_true",
+        help="append kpoints to KPOINTS in cwd")
+    parser_bs.set_defaults(func=bs)
+
 
     try:
         import argcomplete
