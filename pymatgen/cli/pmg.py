@@ -19,7 +19,7 @@ from pymatgen.cli.pmg_structure import analyze_structures
 from pymatgen.core import SETTINGS
 from pymatgen.core.structure import Structure
 from pymatgen.io.vasp import Incar, Potcar
-from pymatgen.cli.pmg_hacks import bs
+from pymatgen.cli.pmg_hacks import bs, kpoint
 from pymatgen import __version__
 
 
@@ -273,6 +273,12 @@ def main():
         metavar="structure_file",
         help="Generate XRD plots from any supported structure file, e.g., CIF, POSCAR, vasprun.xml, etc.",
     )
+    group.add_argument(
+        '-b',
+        '--bandstructure',
+        dest='bs_file',
+        metavar="vasprun.xml"
+    )
 
     parser_plot.add_argument(
         "-s",
@@ -437,29 +443,25 @@ def main():
     parser_potcar.set_defaults(func=generate_potcar)
 
     # hacks parser
-    parser_bs = subparsers.add_parser(
-        "bs", help="Fast band structure utilities")
-    group = parser_bs.add_mutually_exclusive_group(required=True)
+    parser_kp = subparsers.add_parser(
+        "kpoint", help="kpoint generation")
+    group = parser_kp.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        "-p", "--plot", dest="plot", action="store_true", help="plot"
-        " bandstructure")
-    group.add_argument(
-        "-k", "--kpoints", dest="kpoints", action="store_true",
-        help="prepare kpoints")
-    parser_bs.add_argument(
-        "-d", "--dir", dest="dir", help="directory to read from",
-        default=os.getcwd())
-    parser_bs.add_argument(
+        "-b", "--bandstructure", dest="bs_file", help="kpoints"
+        " for a bandstructure calculation from the given structure",
+        metavar="vasprun.xml")
+    parser_kp.add_argument(
         "-l", "--linedensity", dest="line_density", help="density of "
         "kpoints along high symmetry path", type=int, default=20)
-    parser_bs.add_argument(
-        "-s", "--symmetrypath", dest="path", help="high symmetry path"
-        "to take, comma separated list")
-    parser_bs.add_argument(
-        "-a", "--append", dest="append_filename", action="store_true",
-        help="append kpoints to KPOINTS in cwd")
-    parser_bs.set_defaults(func=bs)
-
+    parser_kp.add_argument(
+        "-p", "--path", dest="path", help="high symmetry path"
+        "to take, comma separated list", default='')
+    parser_kp.add_argument(
+        "-s", "--symmetrypath", dest="highsymmetry", action="store_true",
+        help="print high symmetry path and exit")
+    parser_kp.add_argument(
+        "-u", "--update", dest="update", help="update given KPOINTS file")
+    parser_kp.set_defaults(func=kpoint)
 
     try:
         import argcomplete
