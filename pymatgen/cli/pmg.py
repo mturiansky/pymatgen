@@ -455,10 +455,8 @@ def main():
         "kpoints along high symmetry path", type=int, default=20)
     parser_kp.add_argument(
         "-p", "--path", dest="path", help="high symmetry path"
-        "to take, comma separated list", default='')
-    parser_kp.add_argument(
-        "-s", "--symmetrypath", dest="highsymmetry", action="store_true",
-        help="print high symmetry path and exit")
+        "to take, comma separated list (input 'generate' to use the default "
+        "high symmetry path)", default='')
     parser_kp.add_argument(
         "-u", "--update", dest="update", help="update given KPOINTS file")
     parser_kp.set_defaults(func=kpoint)
