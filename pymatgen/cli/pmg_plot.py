@@ -12,6 +12,7 @@ from pymatgen.electronic_structure.plotter import DosPlotter
 from pymatgen.io.vasp import Chgcar, Vasprun
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from pymatgen.util.plotting import pretty_plot
+from pymatgen.cli.pmg_hacks import get_bs_plot
 
 
 def get_dos_plot(args):
@@ -101,6 +102,8 @@ def plot(args):
         plt = get_xrd_plot(args)
     elif args.dos_file:
         plt = get_dos_plot(args)
+    elif args.bs_dir:
+        plt = get_bs_plot(args)
 
     if plt:
         if args.out_file:

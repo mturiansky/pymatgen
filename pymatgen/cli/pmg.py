@@ -331,6 +331,14 @@ def main():
         type=str,
         help="Save plot to file instead of displaying.",
     )
+    parser_plot.add_argument(
+        "-y",
+        "--ylim",
+        dest="ylim",
+        type=float,
+        nargs=2,
+        help="ylim for band structure plot"
+    )
     parser_plot.set_defaults(func=plot)
 
     parser_structure = subparsers.add_parser("structure", help="Structure conversion and analysis tools.")
