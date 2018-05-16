@@ -18,7 +18,7 @@ __email__ = "ongsp@ucsd.edu"
 __date__ = "May 08 2018"
 
 
-def make_bs_kpoint(ifile, ikpath, line_density, print_hs_path, updatef):
+def make_bs_kpoint(ifile, ikpath, line_density, updatef):
     if ifile.split('/')[-1] == 'CONTCAR' or ifile.split('/')[-1] == 'POSCAR':
         s = pmg.Structure.from_file(ifile)
     if ifile.split('/')[-1] == 'vasprun.xml':
@@ -77,5 +77,4 @@ def make_bs_kpoint(ifile, ikpath, line_density, print_hs_path, updatef):
 
 def kpoint(args):
     if args.bs_file:
-        make_bs_kpoint(args.bs_file, args.path, args.line_density,
-                       args.highsymmetry, args.update)
+        make_bs_kpoint(args.bs_file, args.path, args.line_density, args.update)
