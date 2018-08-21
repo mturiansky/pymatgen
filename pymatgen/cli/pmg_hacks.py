@@ -168,13 +168,14 @@ def get_bs_plot(args):
 
 
 def make_bs_kpoint(ifile, ikpath, line_density, updatef):
-    if ifile.split('/')[-1] == 'CONTCAR' or ifile.split('/')[-1] == 'POSCAR':
+    if 'CONTCAR' in ifile.split('/')[-1] or 'POSCAR' in ifile.split('/')[-1]:
         s = pmg.Structure.from_file(ifile)
     if ifile.split('/')[-1] == 'vasprun.xml':
         s = Vasprun(ifile).structures[-1]
 
     hsk = HighSymmKpath(s)
     if ikpath == '':
+        print('[+] space group info:', s.get_space_group_info())
         print('[+] kpoints:', list(hsk.kpath['kpoints'].keys()))
         print('[+] usual path: \'',
               ';'.join([','.join(x) for x in hsk.kpath['path']]),
