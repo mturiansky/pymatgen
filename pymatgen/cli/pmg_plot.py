@@ -33,6 +33,13 @@ def get_dos_plot(args):
         for idx, site in enumerate(structure):
             all_dos[f"Site {idx} {site.specie.symbol}"] = dos.get_site_dos(site)
 
+    if args.sites:
+        inds = [int(tok.strip()) for tok in args.sites[0].split(',')]
+        for i in inds:
+            site = structure[i]
+            all_dos["site " + str(i) + " " + site.specie.symbol] = \
+                dos.get_site_dos(site)
+
     if args.element:
         syms = [tok.strip() for tok in args.element[0].split(",")]
         all_dos = {}
