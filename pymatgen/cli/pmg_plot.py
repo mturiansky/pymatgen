@@ -24,8 +24,9 @@ def get_dos_plot(args):
     vasp_run = Vasprun(args.dos_file)
     dos = vasp_run.complete_dos
 
-    all_dos = {}
-    all_dos["Total"] = dos
+    all_dos = OrderedDict()
+    if not args.no_total:
+        all_dos["Total"] = dos
 
     structure = vasp_run.final_structure
 
