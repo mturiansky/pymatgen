@@ -28,7 +28,8 @@ def get_dos_plot(args):
     dos = v.complete_dos
 
     all_dos = OrderedDict()
-    all_dos["Total"] = dos
+    if not args.no_total:
+        all_dos["Total"] = dos
 
     structure = v.final_structure
 
