@@ -45,6 +45,11 @@ from pymatgen.io.vasp.inputs import Incar, Kpoints, Poscar, Potcar
 from pymatgen.io.wannier90 import Unk
 from pymatgen.util.io_utils import clean_lines, micro_pyawk
 from pymatgen.util.num import make_symmetric_matrix_from_upper_tri
+try:
+    from numba import njit
+except ModuleNotFoundError:
+    def njit(func):
+        return func
 
 logger = logging.getLogger(__name__)
 
