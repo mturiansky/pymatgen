@@ -1836,25 +1836,26 @@ class PotcarSingle:
         self.hash = self.get_potcar_hash()
         self.file_hash = self.get_potcar_file_hash()
 
-        if self.identify_potcar(mode="data")[0] == []:
-            warnings.warn(
-                "POTCAR data with symbol {} does not match any VASP\
-                          POTCAR known to pymatgen. We advise verifying the\
-                          integrity of your POTCAR files.".format(
-                    self.symbol
-                ),
-                UnknownPotcarWarning,
-            )
-        elif self.identify_potcar(mode="file")[0] == []:
-            warnings.warn(
-                "POTCAR with symbol {} has metadata that does not match\
-                          any VASP POTCAR known to pymatgen. The data in this\
-                          POTCAR is known to match the following functionals:\
-                          {}".format(
-                    self.symbol, self.identify_potcar(mode="data")[0]
-                ),
-                UnknownPotcarWarning,
-            )
+        if not SETTINGS.get('IGNORE_POTCAR_WARNINGS', False):
+            if self.identify_potcar(mode="data")[0] == []:
+                warnings.warn(
+                    "POTCAR data with symbol {} does not match any VASP\
+                              POTCAR known to pymatgen. We advise verifying the\
+                              integrity of your POTCAR files.".format(
+                        self.symbol
+                    ),
+                    UnknownPotcarWarning,
+                )
+            elif self.identify_potcar(mode="file")[0] == []:
+                warnings.warn(
+                    "POTCAR with symbol {} has metadata that does not match\
+                              any VASP POTCAR known to pymatgen. The data in this\
+                              POTCAR is known to match the following functionals:\
+                              {}".format(
+                        self.symbol, self.identify_potcar(mode="data")[0]
+                    ),
+                    UnknownPotcarWarning,
+                )
 
     def __str__(self):
         return self.data + "\n"
