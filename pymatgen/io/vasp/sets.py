@@ -47,7 +47,7 @@ from monty.dev import deprecated
 from monty.io import zopen
 from monty.json import MSONable
 from monty.serialization import loadfn
-
+from pymatgen import SETTINGS
 from pymatgen.analysis.structure_matcher import StructureMatcher
 from pymatgen.core import Element, PeriodicSite, SiteCollection, Species, Structure
 from pymatgen.io.core import InputGenerator
@@ -118,14 +118,15 @@ class VaspInputSet(InputGenerator, abc.ABC):
 
         # warn if the selected POTCARs do not correspond to the chosen user_potcar_functional
         for p_single in potcar:
-            if user_potcar_functional not in p_single.identify_potcar()[0]:
-                warnings.warn(
-                    f"POTCAR data with symbol {p_single.symbol} is not known by pymatgen to "
-                    f"correspond with the selected {user_potcar_functional=}. This POTCAR "
-                    f"is known to correspond with functionals {p_single.identify_potcar(mode='data')[0]}. "
-                    "Please verify that you are using the right POTCARs!",
-                    BadInputSetWarning,
-                )
+            if not SETTINGS.get('IGNORE_POTCAR_WARNINGS', False):
+                if user_potcar_functional not in p_single.identify_potcar()[0]:
+                    warnings.warn(
+                        f"POTCAR data with symbol {p_single.symbol} is not known by pymatgen to "
+                        f"correspond with the selected {user_potcar_functional=}. This POTCAR "
+                        f"is known to correspond with functionals {p_single.identify_potcar(mode='data')[0]}. "
+                        "Please verify that you are using the right POTCARs!",
+                        BadInputSetWarning,
+                    )
 
         return potcar
 
@@ -411,6 +412,7 @@ class DictSet(VaspInputSet):
         )
 
         # warn if a user is overriding POTCAR_FUNCTIONAL
+<<<<<<< HEAD
         if self.user_potcar_functional != self._config_dict.get("POTCAR_FUNCTIONAL", "PBE"):
             warnings.warn(
                 "Overriding the POTCAR functional is generally not recommended "
@@ -434,6 +436,32 @@ class DictSet(VaspInputSet):
             )
             for key, val in self.user_potcar_settings.items():
                 self._config_dict["POTCAR"][key] = val
+=======
+        if not SETTINGS.get('IGNORE_POTCAR_WARNINGS', False):
+            if self.potcar_functional != self._config_dict.get("POTCAR_FUNCTIONAL"):
+                warnings.warn(
+                    "Overriding the POTCAR functional is generally not recommended "
+                    " as it significantly affect the results of calculations and "
+                    "compatibility with other calculations done with the same "
+                    "input set. Note that some POTCAR symbols specified in "
+                    "the configuration file may not be available in the selected "
+                    "functional.",
+                    BadInputSetWarning,
+                )
+
+            if self.user_potcar_settings:
+                warnings.warn(
+                    "Overriding POTCARs is generally not recommended as it "
+                    "significantly affect the results of calculations and "
+                    "compatibility with other calculations done with the same "
+                    "input set. In many instances, it is better to write a "
+                    "subclass of a desired input set and override the POTCAR in "
+                    "the subclass to be explicit on the differences.",
+                    BadInputSetWarning,
+                )
+                for k, v in self.user_potcar_settings.items():
+                    self._config_dict["POTCAR"][k] = v
+>>>>>>> de5889d63 (ignore potcar warnings)
 
         if not isinstance(self.structure, Structure):
             self._structure = None
