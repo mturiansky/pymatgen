@@ -4379,7 +4379,14 @@ class Structure(IStructure, collections.abc.MutableSequence):
             species = self[inds[0]].species
             coords = self[inds[0]].frac_coords
             props = self[inds[0]].properties
+            if mode == 'k' and 'keep' in props:
+                continue
             for n, i in enumerate(inds[1:]):
+                if mode == 'k' and 'keep' in self[i].properties:
+                    species = self[i].species
+                    coords = self[i].frac_coords
+                    props = self[i].properties
+
                 sp = self[i].species
                 if mode.lower()[0] == "s":
                     species += sp
