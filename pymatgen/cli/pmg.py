@@ -19,7 +19,7 @@ from pymatgen.cli.pmg_structure import analyze_structures
 from pymatgen.core import SETTINGS
 from pymatgen.core.structure import Structure
 from pymatgen.io.vasp import Incar, Potcar
-from pymatgen.cli.pmg_hacks import bs, kpoint
+from pymatgen.cli.pmg_hacks import kpoint
 from pymatgen import __version__
 
 

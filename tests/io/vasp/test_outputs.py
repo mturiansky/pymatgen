@@ -1775,9 +1775,12 @@ class TestWavecar(PymatgenTest):
         assert self.wavecar._nbmax.tolist() == [5, 5, 5]
 
     def test_generate_g_points(self):
-        for k in range(self.wavecar.nk):
-            kp = self.wavecar.kpoints[k]
-            assert len(self.wavecar._generate_G_points(kp)) <= 257
+        for k in range(self.w.nk):
+            kp = self.w.kpoints[k]
+            gpts = Wavecar._generate_G_points(
+                self.w._nbmax, self.w.encut, self.w.b, kp
+            )
+            assert len(gpts) <= 257
 
     def test_evaluate_wavefunc(self):
         self.wavecar.Gpoints.append(np.array([0, 0, 0]))

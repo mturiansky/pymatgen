@@ -4530,20 +4530,46 @@ class Wavecar:
                     np.fromfile(file, dtype=np.float64, count=(recl8 - 4 - 3 * self.nb) % recl8)
 
                     if self.vasp_type is None:
-                        self.Gpoints[ink], extra_gpoints, extra_coeff_inds = self._generate_G_points(kpoint, gamma=True)
+                        (
+                            self.Gpoints[ink],
+                            extra_gpoints,
+                            extra_coeff_inds,
+                        ) = Wavecar._generate_G_points(
+                            self._nbmax,
+                            self.encut,
+                            self.b,
+                            kpoint,
+                            gamma=True
+                        )
                         if len(self.Gpoints[ink]) == nplane:
                             self.vasp_type = "gam"
                         else:
-                            self.Gpoints[ink], extra_gpoints, extra_coeff_inds = self._generate_G_points(
-                                kpoint, gamma=False
+                            (
+                                self.Gpoints[ink],
+                                extra_gpoints,
+                                extra_coeff_inds,
+                            ) = Wavecar._generate_G_points(
+                                self._nbmax,
+                                self.encut,
+                                self.b,
+                                kpoint,
+                                gamma=False
                             )
                             self.vasp_type = "std" if len(self.Gpoints[ink]) == nplane else "ncl"
 
                         if verbose:
                             print(f"\ndetermined {self.vasp_type = }\n")
                     else:
-                        self.Gpoints[ink], extra_gpoints, extra_coeff_inds = self._generate_G_points(
-                            kpoint, gamma=self.vasp_type.lower()[0] == "g"
+                        (
+                            self.Gpoints[ink],
+                            extra_gpoints,
+                            extra_coeff_inds,
+                        ) = Wavecar._generate_G_points(
+                            self._nbmax,
+                            self.encut,
+                            self.b,
+                            kpoint,
+                            gamma=(self.vasp_type.lower()[0] == "g")
                         )
 
                     if len(self.Gpoints[ink]) != nplane and 2 * len(self.Gpoints[ink]) != nplane:
@@ -4568,11 +4594,13 @@ class Wavecar:
                         extra_coeffs = []
                         if len(extra_coeff_inds) > 0:
                             # reconstruct extra coefficients missing from gamma-only executable WAVECAR
-                            for G_ind in extra_coeff_inds:
-                                # no idea where this factor of sqrt(2) comes from, but empirically
-                                # it appears to be necessary
-                                data[G_ind] /= np.sqrt(2)
-                                extra_coeffs.append(np.conj(data[G_ind]))
+                            data[extra_coeff_inds] /= np.sqrt(2)
+                            extra_coeffs = np.conj(data[extra_coeff_inds]).tolist()
+                            # for G_ind in extra_coeff_inds:
+                            #     # no idea where this factor of sqrt(2) comes from, but empirically
+                            #     # it appears to be necessary
+                            #     data[G_ind] /= np.sqrt(2)
+                            #     extra_coeffs.append(np.conj(data[G_ind]))
 
                         if spin == 2:
                             self.coeffs[ispin][ink][inb] = np.array(list(data) + extra_coeffs, dtype=np.complex64)
@@ -4621,7 +4649,14 @@ class Wavecar:
 
         self._nbmax = np.max([nbmaxA, nbmaxB, nbmaxC], axis=0).astype(int)
 
-    def _generate_G_points(self, kpoint: np.ndarray, gamma: bool = False) -> tuple[list, list, list]:
+    @njit(cache=True)
+    def _generate_G_points(
+            nbmax: int,
+            encut: float,
+            b: np.ndarray,
+            kpoint: np.ndarray,
+            gamma: bool = False
+    ) -> Tuple[List, List, List]:
         """
         Helper function to generate G-points based on nbmax.
 
@@ -4638,25 +4673,28 @@ class Wavecar:
         Returns:
             a list containing valid G-points
         """
-        kmax = self._nbmax[0] + 1 if gamma else 2 * self._nbmax[0] + 1
+        if gamma:
+            kmax = nbmax[0] + 1
+        else:
+            kmax = 2 * nbmax[0] + 1
 
         gpoints = []
         extra_gpoints = []
         extra_coeff_inds = []
         G_ind = 0
-        for i in range(2 * self._nbmax[2] + 1):
-            i3 = i - 2 * self._nbmax[2] - 1 if i > self._nbmax[2] else i
-            for j in range(2 * self._nbmax[1] + 1):
-                j2 = j - 2 * self._nbmax[1] - 1 if j > self._nbmax[1] else j
+        for i in range(2 * nbmax[2] + 1):
+            i3 = i - 2 * nbmax[2] - 1 if i > nbmax[2] else i
+            for j in range(2 * nbmax[1] + 1):
+                j2 = j - 2 * nbmax[1] - 1 if j > nbmax[1] else j
                 for k in range(kmax):
-                    k1 = k - 2 * self._nbmax[0] - 1 if k > self._nbmax[0] else k
+                    k1 = k - 2 * nbmax[0] - 1 if k > nbmax[0] else k
                     if gamma and ((k1 == 0 and j2 < 0) or (k1 == 0 and j2 == 0 and i3 < 0)):
                         continue
                     G = np.array([k1, j2, i3])
                     v = kpoint + G
-                    g = np.linalg.norm(np.dot(v, self.b))
-                    E = g**2 / self._C
-                    if self.encut > E:
+                    g = np.linalg.norm(np.dot(v, b))
+                    E = g ** 2 / 0.262465831
+                    if E < encut:
                         gpoints.append(G)
                         if gamma and (k1, j2, i3) != (0, 0, 0):
                             extra_gpoints.append(-G)
