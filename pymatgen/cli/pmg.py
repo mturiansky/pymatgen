@@ -7,7 +7,6 @@ from __future__ import annotations
 import argparse
 import itertools
 import sys
-import os
 
 from tabulate import tabulate, tabulate_formats
 
@@ -20,7 +19,6 @@ from pymatgen.core import SETTINGS
 from pymatgen.core.structure import Structure
 from pymatgen.io.vasp import Incar, Potcar
 from pymatgen.cli.pmg_hacks import kpoint
-from pymatgen import __version__
 
 
 def parse_view(args):
