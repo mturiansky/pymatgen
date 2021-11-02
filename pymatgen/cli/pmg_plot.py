@@ -110,7 +110,7 @@ def plot(args):
         plt = get_xrd_plot(args)
     elif args.dos_file:
         plt = get_dos_plot(args)
-    elif args.bs_dir:
+    elif args.bs_file:
         plt = get_bs_plot(args)
 
     if plt:

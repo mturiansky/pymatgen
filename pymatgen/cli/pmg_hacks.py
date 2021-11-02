@@ -152,18 +152,22 @@ def plot_sp_proj(fold_name, sym_kpt,ax,xshift=0.0,bg=None, orbs='spd'):
     return tix_dict[u'distance'][-1]+xshift
 
 def get_bs_plot(args):
-    if not os.path.isfile(os.path.join(args.bs_dir, 'KPOINTS')):
-        print('[-] no KPOINTS in', args.bs_dir)
-    if not os.path.isfile(os.path.join(args.bs_dir, 'PROCAR')):
-        print('[-] no PROCAR in', args.bs_dir)
-    if not os.path.isfile(os.path.join(args.bs_dir, 'vasprun.xml')):
-        print('[-] no vasprun.xml in', args.bs_dir)
-    fig, ax = plt.subplots(figsize=(5, 5))
-    plot_sp_proj(args.bs_dir, os.path.join(args.bs_dir, 'KPOINTS'), ax)
-    if args.ylim:
-        ax.set_ylim(args.ylim)
+    if not os.path.isfile(os.path.join(args.bs_file, 'KPOINTS')):
+        print('[-] no KPOINTS in', args.bs_file)
+    if not os.path.isfile(os.path.join(args.bs_file, 'PROCAR')):
+        print('[-] no PROCAR in', args.bs_file)
+    if not os.path.isfile(os.path.join(args.bs_file, 'vasprun.xml')):
+        print('[-] no vasprun.xml in', args.bs_file)
+    if not os.path.isfile(os.path.join(args.bs_file, 'PROCAR')):
+        vr = Vasprun(os.path.join(args.bs_file, 'vasprun.xml'))
+        BSPlotter(vr.get_band_structure(line_mode=True)).get_plot()
     else:
-        ax.set_ylim([-5, 15])
+        fig, ax = plt.subplots(figsize=(5, 5))
+        plot_sp_proj(args.bs_file, os.path.join(args.bs_file, 'KPOINTS'), ax)
+        if args.ylim:
+            ax.set_ylim(args.ylim)
+        else:
+            ax.set_ylim([-5, 15])
     return plt
 
 

@@ -412,33 +412,8 @@ class DictSet(VaspInputSet):
         )
 
         # warn if a user is overriding POTCAR_FUNCTIONAL
-<<<<<<< HEAD
-        if self.user_potcar_functional != self._config_dict.get("POTCAR_FUNCTIONAL", "PBE"):
-            warnings.warn(
-                "Overriding the POTCAR functional is generally not recommended "
-                " as it significantly affect the results of calculations and "
-                "compatibility with other calculations done with the same "
-                "input set. Note that some POTCAR symbols specified in "
-                "the configuration file may not be available in the selected "
-                "functional.",
-                BadInputSetWarning,
-            )
-
-        if self.user_potcar_settings:
-            warnings.warn(
-                "Overriding POTCARs is generally not recommended as it "
-                "significantly affect the results of calculations and "
-                "compatibility with other calculations done with the same "
-                "input set. In many instances, it is better to write a "
-                "subclass of a desired input set and override the POTCAR in "
-                "the subclass to be explicit on the differences.",
-                BadInputSetWarning,
-            )
-            for key, val in self.user_potcar_settings.items():
-                self._config_dict["POTCAR"][key] = val
-=======
         if not SETTINGS.get('IGNORE_POTCAR_WARNINGS', False):
-            if self.potcar_functional != self._config_dict.get("POTCAR_FUNCTIONAL"):
+            if self.user_potcar_functional != self._config_dict.get("POTCAR_FUNCTIONAL", "PBE"):
                 warnings.warn(
                     "Overriding the POTCAR functional is generally not recommended "
                     " as it significantly affect the results of calculations and "
@@ -448,6 +423,8 @@ class DictSet(VaspInputSet):
                     "functional.",
                     BadInputSetWarning,
                 )
+
+            self.structure = structure  # type: ignore
 
             if self.user_potcar_settings:
                 warnings.warn(
@@ -459,9 +436,8 @@ class DictSet(VaspInputSet):
                     "the subclass to be explicit on the differences.",
                     BadInputSetWarning,
                 )
-                for k, v in self.user_potcar_settings.items():
-                    self._config_dict["POTCAR"][k] = v
->>>>>>> de5889d63 (ignore potcar warnings)
+                for key, val in self.user_potcar_settings.items():
+                    self._config_dict["POTCAR"][key] = val
 
         if not isinstance(self.structure, Structure):
             self._structure = None
