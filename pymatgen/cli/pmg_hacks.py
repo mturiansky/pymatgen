@@ -197,8 +197,8 @@ def make_bs_kpoint(ifile, ikpath, line_density, updatef):
         for k0, k1 in zip(kp[:-1], kp[1:]):
             k0c = hsk.kpath['kpoints'][k0]
             k1c = hsk.kpath['kpoints'][k1]
-            dist = np.linalg.norm(hsk._prim_rec.get_cartesian_coords(k0c)
-                                  - hsk._prim_rec.get_cartesian_coords(k1c))
+            dist = np.linalg.norm(hsk.prim_rec.get_cartesian_coords(k0c)
+                                  - hsk.prim_rec.get_cartesian_coords(k1c))
             nb = int(np.ceil(dist * line_density))
             kpts.extend([k0c*(1-x/nb) + k1c*x/nb for x in range(nb + 1)])
             labels.extend([k0] + ['']*(nb - 1) + [k1])
