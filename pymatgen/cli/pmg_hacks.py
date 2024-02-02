@@ -1,5 +1,6 @@
 from __future__ import division, unicode_literals
 from matplotlib import pyplot as plt
+from pymatgen.core import Structure
 from pymatgen.electronic_structure.plotter import BSPlotter
 from pymatgen.io.vasp.outputs import Vasprun, Procar
 from pymatgen.symmetry.bandstructure import HighSymmKpath
@@ -173,7 +174,7 @@ def get_bs_plot(args):
 
 def make_bs_kpoint(ifile, ikpath, line_density, updatef):
     if 'CONTCAR' in ifile.split('/')[-1] or 'POSCAR' in ifile.split('/')[-1]:
-        s = pmg.Structure.from_file(ifile)
+        s = Structure.from_file(ifile)
     if ifile.split('/')[-1] == 'vasprun.xml':
         s = Vasprun(ifile).structures[-1]
 
