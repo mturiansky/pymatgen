@@ -1781,8 +1781,9 @@ class PotcarSingle:
         # Compute the POTCAR meta to check them against the database of known metadata,
         # and possibly SHA256 hashes contained in the file itself.
 
-        if not SETTINGS.get('IGNORE_POTCAR_WARNINGS', False):
-            if not self.is_valid:
+        if not self.is_valid:
+            # is_valid needs to be run for _summary_stats to be present
+            if not SETTINGS.get('IGNORE_POTCAR_WARNINGS', False):
                 warnings.warn(
                     f"POTCAR data with symbol {self.symbol} is not known to pymatgen. Your "
                     "POTCAR may be corrupted or pymatgen's POTCAR database is incomplete.",
